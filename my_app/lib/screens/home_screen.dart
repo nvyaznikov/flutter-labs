@@ -1,7 +1,58 @@
 import 'package:flutter/material.dart';
+import 'about_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _taskController = TextEditingController();
+  final List<Task> _tasks = [
+    Task(id: 1, title: 'Купить молоко', isCompleted: false),
+    Task(id: 2, title: 'Выучить Flutter', isCompleted: true),
+    Task(id: 3, title: 'Позвонить другу', isCompleted: false),
+  ];
+
+  void _addTask() {
+    final text = _taskController.text.trim();
+    if (text.isNotEmpty) {
+      setState(() {
+        _tasks.add(Task(
+          id: DateTime.now().millisecondsSinceEpoch,
+          title: text,
+          isCompleted: false,
+        ));
+        _taskController.clear();
+      });
+    }
+  }
+
+  void _toggleTask(int taskId) {
+    setState(() {
+      for (var task in _tasks) {
+        if (task.id == taskId) {
+          task.isCompleted = !task.isCompleted;
+          break;
+        }
+      }
+    });
+  }
+
+  void _deleteTask(int taskId) {
+    setState(() {
+      _tasks.removeWhere((task) => task.id == taskId);
+    });
+  }
+
+  void _navigateToAbout(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AboutScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +71,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _taskController,
                     decoration: InputDecoration(
                       hintText: 'Введите задачу...',
                       border: OutlineInputBorder(
@@ -30,11 +82,12 @@ class HomeScreen extends StatelessWidget {
                         vertical: 12,
                       ),
                     ),
+                    onSubmitted: (_) => _addTask(),
                   ),
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: null, // Пока без логики
+                  onPressed: _addTask,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -51,25 +104,16 @@ class HomeScreen extends StatelessWidget {
           
           // Список задач
           Expanded(
-            child: ListView(
-              children: const [
-                TaskItem(
-                  title: 'Купить молоко',
-                  isCompleted: false,
-                ),
-                TaskItem(
-                  title: 'Выучить Flutter',
-                  isCompleted: true,
-                ),
-                TaskItem(
-                  title: 'Позвонить другу',
-                  isCompleted: false,
-                ),
-                TaskItem(
-                  title: 'Сделать лабораторную работу',
-                  isCompleted: false,
-                ),
-              ],
+            child: ListView.builder(
+              itemCount: _tasks.length,
+              itemBuilder: (context, index) {
+                final task = _tasks[index];
+                return TaskItem(
+                  task: task,
+                  onToggle: () => _toggleTask(task.id),
+                  onDelete: () => _deleteTask(task.id),
+                );
+              },
             ),
           ),
           
@@ -78,7 +122,7 @@ class HomeScreen extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             child: ElevatedButton.icon(
-              onPressed: null, // Пока без логики
+              onPressed: () => _navigateToAbout(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[200],
                 foregroundColor: Colors.blue,
@@ -94,15 +138,30 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+// Модель задачи
+class Task {
+  final int id;
+  final String title;
+  bool isCompleted;
+
+  Task({
+    required this.id,
+    required this.title,
+    required this.isCompleted,
+  });
+}
+
 // Виджет для отдельной задачи
 class TaskItem extends StatelessWidget {
-  final String title;
-  final bool isCompleted;
+  final Task task;
+  final VoidCallback onToggle;
+  final VoidCallback onDelete;
   
   const TaskItem({
     super.key,
-    required this.title,
-    required this.isCompleted,
+    required this.task,
+    required this.onToggle,
+    required this.onDelete,
   });
 
   @override
@@ -111,19 +170,19 @@ class TaskItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
         leading: Checkbox(
-          value: isCompleted,
-          onChanged: null, // Пока без логики
+          value: task.isCompleted,
+          onChanged: (_) => onToggle(),
         ),
         title: Text(
-          title,
+          task.title,
           style: TextStyle(
-            decoration: isCompleted ? TextDecoration.lineThrough : null,
-            color: isCompleted ? Colors.grey : Colors.black,
+            decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+            color: task.isCompleted ? Colors.grey : Colors.black,
           ),
         ),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline, color: Colors.red),
-          onPressed: null, // Пока без логики
+          onPressed: onDelete,
         ),
       ),
     );

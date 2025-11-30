@@ -3,6 +3,20 @@ import 'package:flutter/material.dart';
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
+  void _navigateBack(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  void _loadQuote(BuildContext context) {
+    // Пока просто показываем сообщение
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Цитата загружена!'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +54,7 @@ class AboutScreen extends StatelessWidget {
             // Кнопка загрузки цитаты
             Center(
               child: ElevatedButton(
-                onPressed: null, // Пока без логики
+                onPressed: () => _loadQuote(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
@@ -90,7 +104,7 @@ class AboutScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: null, // Пока без логики
+                onPressed: () => _navigateBack(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,

@@ -17,8 +17,7 @@ class MainApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      //home: const HomeScreen(), // Начинаем с главного экрана
-      home: const AboutScreen(), // Можно поменять для тестирования
+      home: const HomeScreen(),
     );
   }
 }
