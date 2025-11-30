@@ -1,5 +1,5 @@
-name: my_app
-description: "A new Flutter project."
+name: todo_list
+description: "Простое приложение для управления задачами с цитатами дня"
 publish_to: "none"
 
 version: 1.0.0+1
